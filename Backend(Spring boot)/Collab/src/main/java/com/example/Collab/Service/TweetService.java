@@ -14,7 +14,7 @@ public class TweetService {
     @Autowired
     private TweetRepository repo;
 
-    public void addTweet(Tweets tweet){
+    public void addTweet(Tweets tweet) {
         repo.save(tweet);
     }
 
@@ -25,6 +25,4 @@ public class TweetService {
     public Tweets getTweetById(int id){
         return (Tweets) repo.findById(id).orElse(new Tweets());
     }
-
-
 }
