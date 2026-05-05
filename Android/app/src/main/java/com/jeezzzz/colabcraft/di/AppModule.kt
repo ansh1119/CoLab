@@ -16,8 +16,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    // Use 192.168.1.4 for Physical Device (Local Wi-Fi IP)
-    private const val BASE_URL = "http://192.168.1.4:8081/"
+    // Use 10.83.22.218 for Physical Device (Local Wi-Fi IP)
+    private const val BASE_URL = "http://10.83.22.218:8081/"
 
     @Provides
     @Singleton
