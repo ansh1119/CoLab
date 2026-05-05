@@ -33,6 +33,10 @@ public class Post {
     @JoinColumn(name = "hackathon_id")
     private Hackathon hackathon; // Optional: linked to a specific event
 
+    private int likeCount = 0;
+    private int commentCount = 0;
+    private int repostCount = 0;
+
     public enum PostType {
         LOOKING_FOR_TEAM,
         LOOKING_FOR_MEMBER

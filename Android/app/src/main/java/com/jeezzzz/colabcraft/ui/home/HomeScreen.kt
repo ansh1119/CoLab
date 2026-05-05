@@ -46,6 +46,10 @@ fun HomeScreen(
     val recommended by viewModel.recommendedPosts.collectAsState()
     val isLoading  by viewModel.isLoading.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -187,13 +191,19 @@ fun HomeScreen(
                 }
             } else {
                 items(displayPosts, key = { it.id ?: it.description }) { post ->
-                    PostCard(post) { clicked ->
-                        clicked.user?.id?.let { uid ->
-                            viewModel.startChat(uid) { teamId ->
-                                navController.navigate("chat/$teamId")
+                    PostCard(
+                        post = post,
+                        onLikeClick = { post.id?.let { viewModel.likePost(it) } },
+                        onRepostClick = { post.id?.let { viewModel.repostPost(it) } },
+                        onCommentClick = { post.id?.let { viewModel.commentPost(it) } },
+                        onApplyClick = { clicked ->
+                            clicked.user?.id?.let { uid ->
+                                viewModel.startChat(uid) { teamId ->
+                                    navController.navigate("chat/$teamId")
+                                }
                             }
                         }
-                    }
+                    )
                     Divider(color = Color.White.copy(alpha = 0.05f))
                 }
             }
@@ -239,10 +249,16 @@ fun HackathonCard(hackathon: Hackathon, onClick: (Long) -> Unit) {
 
 // ── Post Card (matching screenshot layout) ─────────────────────────────
 @Composable
-fun PostCard(post: Post, onApplyClick: (Post) -> Unit) {
-    val likeCount    = ((post.id ?: 2L) % 15 + 1).toInt()
-    val signalCount  = ((post.id ?: 4L) % 10 + 1).toInt()
-    val commentCount = ((post.id ?: 0L) % 5).toInt()
+fun PostCard(
+    post: Post,
+    onLikeClick: () -> Unit,
+    onRepostClick: () -> Unit,
+    onCommentClick: () -> Unit,
+    onApplyClick: (Post) -> Unit
+) {
+    val likeCount    = post.likeCount
+    val signalCount  = post.repostCount
+    val commentCount = post.commentCount
 
     Column(
         modifier = Modifier
@@ -280,10 +296,11 @@ fun PostCard(post: Post, onApplyClick: (Post) -> Unit) {
                     fontWeight = FontWeight.ExtraBold,
                     color      = MaterialTheme.colorScheme.onSurface
                 )
+                val timeAgo = listOf("Just now", "2m ago", "1h ago", "3h ago", "1d ago", "2d ago")[(post.id?.toInt() ?: 0) % 6]
                 Text(
                     buildString {
                         append("@${(post.user?.username ?: "user").lowercase().replace(" ", "_")}")
-                        append(" · 2mins ago")
+                        append(" · $timeAgo")
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -340,9 +357,9 @@ fun PostCard(post: Post, onApplyClick: (Post) -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Heart
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onLikeClick() }.padding(4.dp)) {
                 Icon(Icons.Default.Favorite, null,
-                    tint     = Color(0xFFFF6B6B),
+                    tint     = if (likeCount > 0) Color(0xFFFF6B6B) else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
                 Text(
@@ -355,7 +372,7 @@ fun PostCard(post: Post, onApplyClick: (Post) -> Unit) {
             Spacer(Modifier.width(18.dp))
 
             // Signal / Reach
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onRepostClick() }.padding(4.dp)) {
                 Text("📶",
                     fontSize = 12.sp,
                     modifier = Modifier.size(16.dp))
@@ -370,7 +387,7 @@ fun PostCard(post: Post, onApplyClick: (Post) -> Unit) {
             Spacer(Modifier.width(18.dp))
 
             // Comment
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clickable { onCommentClick() }.padding(4.dp)) {
                 Text("💬",
                     fontSize = 12.sp,
                     modifier = Modifier.size(16.dp))

@@ -35,6 +35,15 @@ interface CollabApi {
     @POST("/api/posts/recommend")
     suspend fun getRecommendedPosts(@Body userSkills: List<String>): List<Post>
 
+    @POST("/api/posts/{id}/like")
+    suspend fun likePost(@Path("id") id: Long): Post
+
+    @POST("/api/posts/{id}/repost")
+    suspend fun repostPost(@Path("id") id: Long): Post
+
+    @POST("/api/posts/{id}/comment")
+    suspend fun commentPost(@Path("id") id: Long): Post
+
     // Teams
     @POST("/api/teams")
     suspend fun createTeam(@Body team: Team): Team

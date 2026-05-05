@@ -44,6 +44,12 @@ class CollabRepository @Inject constructor(
 
     suspend fun getRecommendedPosts(userSkills: List<String>): Result<List<Post>> = runCatching { api.getRecommendedPosts(userSkills) }
 
+    suspend fun likePost(id: Long): Result<Post> = runCatching { api.likePost(id) }
+    
+    suspend fun repostPost(id: Long): Result<Post> = runCatching { api.repostPost(id) }
+    
+    suspend fun commentPost(id: Long): Result<Post> = runCatching { api.commentPost(id) }
+
     suspend fun sendMessage(message: Message): Result<Message> = runCatching { api.sendMessage(message) }
 
     suspend fun getMessages(teamId: Long): Result<List<Message>> = runCatching { api.getMessages(teamId) }

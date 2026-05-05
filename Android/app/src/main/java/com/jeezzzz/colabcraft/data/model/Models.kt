@@ -29,7 +29,10 @@ data class Post(
     val description: String,
     val requiredTechStack: List<String>?,
     val user: User?,
-    val hackathon: Hackathon?
+    val hackathon: Hackathon?,
+    val likeCount: Int = 0,
+    val commentCount: Int = 0,
+    val repostCount: Int = 0
 )
 
 data class RegisterRequest(

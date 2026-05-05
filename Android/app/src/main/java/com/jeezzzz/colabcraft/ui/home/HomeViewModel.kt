@@ -84,4 +84,27 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun likePost(postId: Long) {
+        viewModelScope.launch {
+            repository.likePost(postId).onSuccess { updated -> updatePostInLists(updated) }
+        }
+    }
+
+    fun repostPost(postId: Long) {
+        viewModelScope.launch {
+            repository.repostPost(postId).onSuccess { updated -> updatePostInLists(updated) }
+        }
+    }
+
+    fun commentPost(postId: Long) {
+        viewModelScope.launch {
+            repository.commentPost(postId).onSuccess { updated -> updatePostInLists(updated) }
+        }
+    }
+
+    private fun updatePostInLists(updated: Post) {
+        _posts.value = _posts.value.map { if (it.id == updated.id) updated else it }
+        _recommendedPosts.value = _recommendedPosts.value.map { if (it.id == updated.id) updated else it }
+    }
 }
